@@ -6,6 +6,7 @@ from youtube_transcript_api import (
     TranscriptsDisabled,
 )
 from tqdm import tqdm
+import re
 
 
 """
@@ -31,6 +32,18 @@ def fetch_transcript(video_id):
     return " ".join(chunk.text for chunk in transcript_data)
 
 
+def clean_transcript(text: str) -> str:
+    # Replace non-breaking spaces
+    text = text.replace("\u00a0", " ")
+
+    # Remove excessive newlines
+    text = re.sub(r"\n+", " ", text)
+
+    # Normalize whitespace
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
+
 
 def main():
     with open(INPUT_FILE, "r") as f:
@@ -48,7 +61,13 @@ def main():
             print(f"[SKIP] Already exists: {video_id}")
             continue
 
-        text = fetch_transcript(video_id)
+        raw_text = fetch_transcript(video_id)
+        if not raw_text:
+            print(f"[SKIP] No transcript for {video_id}")
+            continue
+
+        text = clean_transcript(raw_text)
+
         if not text:
             print(f"[SKIP] No transcript for {video_id}")
             continue
