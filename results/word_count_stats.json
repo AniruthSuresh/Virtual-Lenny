@@ -1,0 +1,16 @@
+{
+  "youtube": {
+    "documents": 100,
+    "min_words": 8448,
+    "max_words": 25822,
+    "mean_words": 16728.96,
+    "median_words": 17019
+  },
+  "linkedin": {
+    "documents": 100,
+    "min_words": 2,
+    "max_words": 489,
+    "mean_words": 172.11,
+    "median_words": 120
+  }
+}
