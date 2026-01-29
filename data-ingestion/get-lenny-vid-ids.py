@@ -1,5 +1,10 @@
 import subprocess
 import os
+from youtube_transcript_api import (
+    YouTubeTranscriptApi,
+    NoTranscriptFound,
+    TranscriptsDisabled,
+)
 
 PLAYLIST_URL = "https://www.youtube.com/playlist?list=PL2fLjt2dG0N6unOOF3nHWYGcJJIQR1NKm"
 MAX_VIDEOS = 100
@@ -10,7 +15,7 @@ OUTPUT_FILE = os.path.join(OUTPUT_DIR, "video_ids.txt")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def get_video_ids(playlist_url, max_videos):
+def get_video_ids(playlist_url):
     """
     Uses yt-dlp to reliably extract video IDs from a playlist.
     """
@@ -28,15 +33,43 @@ def get_video_ids(playlist_url, max_videos):
         check=True,
     )
 
-    video_ids = result.stdout.strip().split("\n")
-    return video_ids[:max_videos]
+    return result.stdout.strip().split("\n")
+
+
+def has_transcript(video_id):
+    """
+    Checks whether an English transcript exists for a video.
+    """
+    try:
+        ytt_api = YouTubeTranscriptApi()
+        transcript_list = ytt_api.list(video_id)
+        transcript_list.find_transcript(["en"])
+        return True
+    except (NoTranscriptFound, TranscriptsDisabled):
+        return False
+    except Exception as e:
+        print(f"[ERROR] Transcript check failed for {video_id}: {e}")
+        return False
 
 
 if __name__ == "__main__":
-    ids = get_video_ids(PLAYLIST_URL, MAX_VIDEOS)
+    all_ids = get_video_ids(PLAYLIST_URL)
+
+    valid_ids = []
+    print(f"[INFO] Found {len(all_ids)} total videos, checking transcripts...")
+
+    for vid in all_ids:
+        if len(valid_ids) >= MAX_VIDEOS:
+            break
+
+        if has_transcript(vid):
+            valid_ids.append(vid)
+            print(f"[OK] Transcript found: {vid}")
+        else:
+            print(f"[SKIP] No transcript: {vid}")
 
     with open(OUTPUT_FILE, "w") as f:
-        for vid in ids:
+        for vid in valid_ids:
             f.write(f"{vid}\thttps://youtu.be/{vid}\n")
 
-    print(f"[OK] Saved {len(ids)} video IDs to {OUTPUT_FILE}")
+    print(f"\n[DONE] Saved {len(valid_ids)} transcript-ready video IDs to {OUTPUT_FILE}")
