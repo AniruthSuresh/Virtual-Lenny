@@ -4,6 +4,7 @@ import random
 from google import genai
 from tqdm import tqdm
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
@@ -41,9 +42,21 @@ DATASETS = {
     },
 }
 
-# -----------------------
-# Question generation
-# -----------------------
+
+
+def generate_local(prompt):
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "qwen2.5:7b-instruct",
+            "prompt": prompt,
+            "temperature": 0.3,
+            "stream": False
+        }
+    )
+    return response.json()["response"].strip()
+
+
 def generate_questions(chunks, output_path):
     gold_dataset = []
 
@@ -59,12 +72,18 @@ def generate_questions(chunks, output_path):
         )
 
         try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-            )
+            """
+            Gemini 2.5 flash --> ran out of quota
+            So , using local model for now
+            """
+            # response = client.models.generate_content(
+            #     model="gemini-2.5-flash",
+            #     contents=prompt,
+            # )
 
-            question = response.text.strip()
+            # question = response.text.strip()
+
+            question = generate_local(prompt)
 
             gold_dataset.append({
                 "question": question,
