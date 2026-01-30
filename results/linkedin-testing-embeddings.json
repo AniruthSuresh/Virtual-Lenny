@@ -1,0 +1,27 @@
+{
+    "mxbai-v1": {
+        "MRR": 0.8617,
+        "HitRate@5": 0.98,
+        "AvgQueryTimeSec": 0.0093
+    },
+    "UAE-Large-V1": {
+        "MRR": 0.86,
+        "HitRate@5": 0.98,
+        "AvgQueryTimeSec": 0.0122
+    },
+    "all-MiniLM-L6-v2": {
+        "MRR": 0.8057,
+        "HitRate@5": 0.88,
+        "AvgQueryTimeSec": 0.0035
+    },
+    "all-mpnet-base-v2": {
+        "MRR": 0.84,
+        "HitRate@5": 0.88,
+        "AvgQueryTimeSec": 0.0055
+    },
+    "sentence-T5-base": {
+        "MRR": 0.785,
+        "HitRate@5": 0.86,
+        "AvgQueryTimeSec": 0.0078
+    }
+}
