@@ -14,7 +14,7 @@ load_dotenv()
 with open("../data/chunks/final_chunks.json", "r") as f:
     all_chunks = json.load(f)
 
-with open("../data/chunks/linkedin_50_questions.json", "r") as f:
+with open("../data/chunks/youtube_50_questions.json", "r") as f:
     gold_set = json.load(f)
 
 corpus_texts = [c['content'] for c in all_chunks]
@@ -109,7 +109,7 @@ results = {
 
 print("\n" + "="*40 + "\n FINAL LEADERBOARD\n" + "="*40)
 
-OUTPUT_PATH = "../results/linkedin-testing-embeddings.json"
+OUTPUT_PATH = "../results/youtube-testing-embeddings.json"
 os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
 with open(OUTPUT_PATH, "w") as f:
