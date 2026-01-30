@@ -95,7 +95,12 @@ def evaluate_model(name, model_type="local", path=None):
 
     return metrics
 
+"""
+These embeddings were chosen based on their performance in : https://arxiv.org/pdf/2407.08275v1
 
+- text-embedding-3-large -- is paid 
+- SFR-Embedding-Mistral -- too big for local testing (40GB+)
+"""
 
 results = {
     "mxbai-v1": evaluate_model("mxbai-v1", "local", "mixedbread-ai/mxbai-embed-large-v1"),
