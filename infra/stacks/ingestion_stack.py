@@ -105,7 +105,7 @@ class IngestionStack(Stack):
                 str(lambdas_dir / "generate_embeddings")
             ),
             timeout=Duration.minutes(15),
-            memory_size=3072,  # 3GB
+            memory_size=3008,  # 3GB
             environment={
                 "MODEL_NAME": "mixedbread-ai/mxbai-embed-large-v1"
             }
