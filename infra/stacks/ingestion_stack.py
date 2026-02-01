@@ -218,6 +218,9 @@ class IngestionStack(Stack):
         )
                 
         # Task 6: Store in Qdrant Cloud
+        """
+        qdrant_url & qdrant_api_key -- it get's from the .env in the handler !
+        """
         store_qdrant_task = tasks.LambdaInvoke(
             self, "StoreQdrantTask",
             lambda_function=store_qdrant,
