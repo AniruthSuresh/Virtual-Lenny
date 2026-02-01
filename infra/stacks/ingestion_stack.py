@@ -50,8 +50,8 @@ class IngestionStack(Stack):
         scrape_linkedin = _lambda.Function(
             self, "ScrapeLinkedIn",
             runtime=_lambda.Runtime.PYTHON_3_11,
-            handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambdas/scrape_linkedin"),
+            handler="handler.lambda_handler" ,
+            code=_lambda.Code.from_asset("../../lambdas/scrape_linkedin"),
             timeout=Duration.minutes(5),
             memory_size=1024,
             environment={
@@ -65,7 +65,7 @@ class IngestionStack(Stack):
             self, "ScrapeYouTube",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambdas/scrape_youtube"),
+            code=_lambda.Code.from_asset("../../lambdas/scrape_youtube"),
             timeout=Duration.minutes(10),
             memory_size=512
         )
@@ -76,7 +76,7 @@ class IngestionStack(Stack):
             self, "CleanData",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambdas/clean_data"),
+            code=_lambda.Code.from_asset("../../lambdas/clean_data"),
             timeout=Duration.minutes(5),
             memory_size=512
         )
@@ -87,7 +87,7 @@ class IngestionStack(Stack):
             self, "ChunkData",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambdas/chunk_data"),
+            code=_lambda.Code.from_asset("../../lambdas/chunk_data"),
             timeout=Duration.minutes(3),
             memory_size=1024
         )
@@ -97,7 +97,7 @@ class IngestionStack(Stack):
         generate_embeddings = _lambda.DockerImageFunction(
             self, "GenerateEmbeddings",
             code=_lambda.DockerImageCode.from_image_asset(
-                "../lambdas/generate_embeddings"
+                "../../lambdas/generate_embeddings"
             ),
             timeout=Duration.minutes(15),
             memory_size=3072,  # 3GB for model loading
@@ -112,7 +112,7 @@ class IngestionStack(Stack):
             self, "StoreQdrant",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambdas/store_qdrant"),
+            code=_lambda.Code.from_asset("../../lambdas/store_qdrant"),
             timeout=Duration.minutes(10),
             memory_size=1024,
             environment={
@@ -192,19 +192,31 @@ class IngestionStack(Stack):
         )
         
         # Task 5: Generate Embeddings
+        # generate_embeddings_task = tasks.LambdaInvoke(
+        #     self, "GenerateEmbeddingsTask",
+        #     lambda_function=generate_embeddings,
+        #     payload=sfn.TaskInput.from_object({
+        #         "input_bucket": data_bucket.bucket_name,
+        #         "chunks_key": "data/chunks/final_chunks.json",
+        #         "output_bucket": data_bucket.bucket_name,
+        #         "output_key": "data/embedded/mxbai_corpus.pt"
+        #     }),
+        #     result_path="$.embedding_result",
+        #     retry_on_service_exceptions=True
+        # )
+        
         generate_embeddings_task = tasks.LambdaInvoke(
             self, "GenerateEmbeddingsTask",
             lambda_function=generate_embeddings,
             payload=sfn.TaskInput.from_object({
-                "input_bucket": data_bucket.bucket_name,
-                "chunks_key": "data/chunks/final_chunks.json",
-                "output_bucket": data_bucket.bucket_name,
+                "bucket": data_bucket.bucket_name,      
+                "input_key": "data/chunks/final_chunks.json", 
                 "output_key": "data/embedded/mxbai_corpus.pt"
             }),
             result_path="$.embedding_result",
             retry_on_service_exceptions=True
         )
-        
+                
         # Task 6: Store in Qdrant Cloud
         store_qdrant_task = tasks.LambdaInvoke(
             self, "StoreQdrantTask",
