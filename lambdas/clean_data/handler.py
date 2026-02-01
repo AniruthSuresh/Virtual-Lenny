@@ -59,17 +59,26 @@ def lambda_handler(event, context):
                     cleaned_data = clean_linkedin_data(data)
                 else:
                     cleaned_data = clean_youtube_data(data)
-                
-                # Write cleaned data
+
                 output_key = key.replace(input_prefix, output_prefix)
-                s3.put_object(
-                    Bucket=event['output_bucket'],
-                    Key=output_key,
-                    Body=json.dumps(cleaned_data, indent=2, ensure_ascii=False),
-                    ContentType='application/json'
-                )
-                
-                cleaned_count += 1
+
+                try:
+                    s3.head_object(Bucket=event['output_bucket'], Key=output_key)
+                    print(f"SKIPPING: {output_key} already exists")
+                    continue
+                except s3.exceptions.ClientError as e:
+
+                    if e.response['Error']['Code'] == '404':
+                        s3.put_object(
+                            Bucket=event['output_bucket'],
+                            Key=output_key,
+                            Body=json.dumps(cleaned_data, indent=2, ensure_ascii=False),
+                            ContentType='application/json'
+                        )
+                        cleaned_count += 1
+                        print(f"Saved: {output_key}")
+                    else:
+                        raise
         
         return {
             'statusCode': 200,
