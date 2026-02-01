@@ -13,7 +13,7 @@ from apify_client import ApifyClient
 from dotenv import load_dotenv
 
 import os
-
+from pathlib import Path
 load_dotenv()
 
 
@@ -34,7 +34,12 @@ class IngestionStack(Stack):
         **kwargs
     ):
         super().__init__(scope, id, **kwargs)
+    
+        root_dir = Path(__file__).resolve().parent.parent.parent
+        lambdas_dir = root_dir / "lambdas"
         
+        print(f"DEBUG: Looking for lambdas at: {lambdas_dir}")
+
         # -------------------------
         # Configuration Variables
         # -------------------------
@@ -51,7 +56,7 @@ class IngestionStack(Stack):
             self, "ScrapeLinkedIn",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler" ,
-            code=_lambda.Code.from_asset("../../lambdas/scrape_linkedin"),
+            code=_lambda.Code.from_asset(str(lambdas_dir / "scrape_linkedin")),
             timeout=Duration.minutes(5),
             memory_size=1024,
             environment={
@@ -65,7 +70,7 @@ class IngestionStack(Stack):
             self, "ScrapeYouTube",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../../lambdas/scrape_youtube"),
+            code=_lambda.Code.from_asset(str(lambdas_dir/"scrape_youtube")),
             timeout=Duration.minutes(10),
             memory_size=512
         )
@@ -76,7 +81,7 @@ class IngestionStack(Stack):
             self, "CleanData",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../../lambdas/clean_data"),
+            code=_lambda.Code.from_asset(str(lambdas_dir/"clean_data")),
             timeout=Duration.minutes(5),
             memory_size=512
         )
@@ -87,7 +92,7 @@ class IngestionStack(Stack):
             self, "ChunkData",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../../lambdas/chunk_data"),
+            code=_lambda.Code.from_asset(str(lambdas_dir/"chunk_data")),
             timeout=Duration.minutes(3),
             memory_size=1024
         )
@@ -97,14 +102,15 @@ class IngestionStack(Stack):
         generate_embeddings = _lambda.DockerImageFunction(
             self, "GenerateEmbeddings",
             code=_lambda.DockerImageCode.from_image_asset(
-                "../../lambdas/generate_embeddings"
+                str(lambdas_dir / "generate_embeddings")
             ),
             timeout=Duration.minutes(15),
-            memory_size=3072,  # 3GB for model loading
+            memory_size=3072,  # 3GB
             environment={
                 "MODEL_NAME": "mixedbread-ai/mxbai-embed-large-v1"
             }
         )
+
         data_bucket.grant_read_write(generate_embeddings)
         
         # 6. Store in Qdrant Cloud
@@ -112,7 +118,7 @@ class IngestionStack(Stack):
             self, "StoreQdrant",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../../lambdas/store_qdrant"),
+            code=_lambda.Code.from_asset(str(lambdas_dir/"store_qdrant")),
             timeout=Duration.minutes(10),
             memory_size=1024,
             environment={

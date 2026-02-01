@@ -8,12 +8,12 @@ app = cdk.App()
 storage = StorageStack(app, "VirtualLennyStorageStack")
 
 # # 2. Initialize the Ingestion Stack
-# # We pass the bucket object (storage.bucket) to the ingestion pipeline
-# IngestionStack(
-#     app, 
-#     "VirtualLennyIngestionStack",
-#     data_bucket=storage.bucket
-# )
+# We pass the bucket object (storage.bucket) to the ingestion pipeline
+IngestionStack(
+    app, 
+    "VirtualLennyIngestionStack",
+    data_bucket=storage.bucket
+)
 
 app.synth()
 
