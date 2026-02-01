@@ -4,11 +4,21 @@ import boto3
 import torch
 import io
 from sentence_transformers import SentenceTransformer
+import botocore
 
 s3 = boto3.client('s3')
 
-MODEL_NAME = "mixedbread-ai/mxbai-embed-large-v1" # this was the best model for us in terms of performance vs cost
-model = SentenceTransformer(MODEL_NAME, device="cuda") if torch.cuda.is_available() else SentenceTransformer(MODEL_NAME, device="cpu")
+os.environ['TRANSFORMERS_CACHE'] = '/tmp'
+os.environ['HF_HOME'] = '/tmp'
+
+# MODEL_NAME = "mixedbread-ai/mxbai-embed-large-v1" # this was the best model for us in terms of performance vs cost
+# # model = SentenceTransformer(MODEL_NAME, device="cuda") if torch.cuda.is_available() else SentenceTransformer(MODEL_NAME, device="cpu")
+# model = SentenceTransformer(MODEL_NAME, device="cpu")
+
+MODEL_PATH = "/var/task/mxbai_model"
+
+# Load from the local path, not from the HF Hub
+model = SentenceTransformer(MODEL_PATH, device="cpu")
 
 def lambda_handler(event, context):
     """
@@ -21,6 +31,23 @@ def lambda_handler(event, context):
     bucket = event['bucket']
     input_key = event['input_key']
     output_key = event['output_key']
+
+    try:
+        s3.head_object(Bucket=bucket, Key=output_key)
+        print(f" SKIPPING: File already exists at s3://{bucket}/{output_key}")
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "status": "skipped",
+                "message": "File already exists",
+                "output_key": output_key
+            })
+        }
+    except botocore.exceptions.ClientError as e:
+
+        if e.response['Error']['Code'] != "404":
+            print(f"Error checking S3: {str(e)}")
+            raise e
 
     try:
         # 1. Download chunks from S3
