@@ -68,7 +68,7 @@ def push_video_ids_to_s3(bucket_name, s3_key, video_ids):
 PLAYLIST_URL = "https://www.youtube.com/playlist?list=PL2fLjt2dG0N6unOOF3nHWYGcJJIQR1NKm"
 MAX_VIDEOS = 100
 
-OUTPUT_DIR = "../../../data/raw/youtube"
+OUTPUT_DIR = "../data/raw/youtube"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "video_ids.txt")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
