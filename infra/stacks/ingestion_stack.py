@@ -153,7 +153,7 @@ class IngestionStack(Stack):
         generate_embeddings = _lambda.DockerImageFunction(
                     self, "GenerateEmbeddings",
                     code=_lambda.DockerImageCode.from_image_asset(str(lambdas_dir / "generate_embeddings")),
-                    timeout=Duration.minutes(15),
+                    timeout=Duration.minutes(30),
                     memory_size=3008,
                     environment={
                             "MODEL_NAME": "mixedbread-ai/mxbai-embed-large-v1",
