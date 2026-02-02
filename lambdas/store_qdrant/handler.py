@@ -1,6 +1,6 @@
 import json
 import boto3
-import torch
+import numpy as np
 import uuid
 import tempfile
 import os
@@ -75,17 +75,32 @@ def lambda_handler(event, context):
                 print(f" Deleting existing collection for fresh upload...")
                 client.delete_collection(collection_name=collection_name)
         
+        # print(f"⬇Downloading embeddings from s3://{input_bucket}/{embeddings_key}")
+        # with tempfile.NamedTemporaryFile(suffix='.pt', delete=False) as tmp:
+        #     s3.download_file(input_bucket, embeddings_key, tmp.name)
+            
+        #     print(" Loading embeddings file...")
+        #     data = torch.load(tmp.name, map_location='cpu')
+        #     embeddings = data["embeddings"]
+        #     chunks = data["chunks"]
+            
+        #     os.unlink(tmp.name)
+        
         print(f"⬇Downloading embeddings from s3://{input_bucket}/{embeddings_key}")
-        with tempfile.NamedTemporaryFile(suffix='.pt', delete=False) as tmp:
+        with tempfile.NamedTemporaryFile(suffix='.npz', delete=False) as tmp:
             s3.download_file(input_bucket, embeddings_key, tmp.name)
             
             print(" Loading embeddings file...")
-            data = torch.load(tmp.name, map_location='cpu')
-            embeddings = data["embeddings"]
-            chunks = data["chunks"]
+            # Use np.load instead of torch.load
+            with np.load(tmp.name, allow_pickle=True) as data:
+                embeddings = data["embeddings"]
+                # If chunks was saved as a single object array, use .item()
+                chunks = data["chunks"]
+                if chunks.dtype == object and chunks.ndim == 0:
+                    chunks = chunks.item()
             
             os.unlink(tmp.name)
-        
+
         print(f"Loaded {len(chunks)} chunks with embeddings of dimension {embeddings.shape[1]}")
         
         # Create collection if it doesn't exist
@@ -108,18 +123,30 @@ def lambda_handler(event, context):
             batch_embs = embeddings[start_idx:end_idx]
             
             points = []
+            # for i, chunk in enumerate(batch_chunks):
+            #     # Create deterministic UUID from chunk_id
+            #     point_id = str(uuid.uuid5(uuid.NAMESPACE_OID, chunk["chunk_id"]))
+                
+            #     points.append(
+            #         PointStruct(
+            #             id=point_id,
+            #             vector=batch_embs[i].tolist(),
+            #             payload=chunk
+            #         )
+            #     )
+
             for i, chunk in enumerate(batch_chunks):
                 # Create deterministic UUID from chunk_id
                 point_id = str(uuid.uuid5(uuid.NAMESPACE_OID, chunk["chunk_id"]))
-                
+
                 points.append(
                     PointStruct(
                         id=point_id,
-                        vector=batch_embs[i].tolist(),
+                        vector=batch_embs[i].tolist(), # Direct numpy to list conversion
                         payload=chunk
                     )
                 )
-            
+
             # Upsert batch to Qdrant Cloud
             client.upsert(
                 collection_name=collection_name,
