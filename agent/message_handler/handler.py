@@ -93,7 +93,6 @@ def lambda_handler(event, context):
         # 5. Token Streaming Loop for ConverseStream
 
         print("\n LENNY IS SPEAKING: ")
-        
         for event in response.get("stream"):
             if "contentBlockDelta" in event:
                 token = event["contentBlockDelta"]["delta"]["text"]

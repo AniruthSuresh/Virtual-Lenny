@@ -104,20 +104,36 @@ class WebSocketStack(Stack):
         # -------------------------
         # WebSocket API
         # -------------------------
-        web_socket_api = apigwv2.WebSocketApi(
+        web_socket_api = apigwv2.WebSocketApi( # this creates the websocket server 
             self, "VirtualLennyWebSocket",
+
+            # Browser opens WebSocket
+            # → $connect
+            # → ConnectHandler
+            # → DynamoDB store connectionId
             connect_route_options=apigwv2.WebSocketRouteOptions(
                 integration=integrations.WebSocketLambdaIntegration(
                     "ConnectIntegration",
                     connect_handler
                 )
             ),
+
+            # Browser closes
+            # → $disconnect
+            # → DisconnectHandler
+            # → DynamoDB cleanup
             disconnect_route_options=apigwv2.WebSocketRouteOptions(
                 integration=integrations.WebSocketLambdaIntegration(
                     "DisconnectIntegration",
                     disconnect_handler
                 )
             ),
+
+            # Browser sends message
+            # → $default
+            # → MessageHandler
+            # → RAG + Bedrock
+            # → post_to_connection()
             default_route_options=apigwv2.WebSocketRouteOptions(
                 integration=integrations.WebSocketLambdaIntegration(
                     "MessageIntegration",
@@ -134,21 +150,11 @@ class WebSocketStack(Stack):
             auto_deploy=True
         )
     
-        # # IMPORTANT: Grant message handler permission to post back to WebSocket connections
-        # # This is crucial for the handler to send responses back
-        # message_handler.add_to_role_policy(
-        #     iam.PolicyStatement(
-        #         actions=["execute-api:ManageConnections"],
-        #         resources=[
-        #             # Construct the ARN for the WebSocket API
-        #             f"arn:aws:execute-api:{self.region}:{self.account}:" \
-        #             f"{web_socket_api.api_id}/{stage.stage_name}/POST/@connections/*"
-        #         ]
-        #     )
-        # )
 
-        # Crucial for post_to_connection
+
+        # message_handler Lambda permission to send messages back to connected WebSocket clients. 
         web_socket_api.grant_manage_connections(message_handler)
+        
         # -------------------------
         # Outputs
         # -------------------------
