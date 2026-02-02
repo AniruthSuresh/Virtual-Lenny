@@ -22,7 +22,7 @@ qdrant = QdrantClient(url=os.environ['QDRANT_URL'], api_key=os.environ['QDRANT_A
 
 def lambda_handler(event, context):
     connection_id = event['requestContext']['connectionId']
-    # Define where to send the stream back
+
     domain = event['requestContext']['domainName']
     stage = event['requestContext']['stage']
     apigw = boto3.client('apigatewaymanagementapi', endpoint_url=f"https://{domain}/{stage}" , region_name='us-east-1')
@@ -34,7 +34,13 @@ def lambda_handler(event, context):
 
         # 2. RAG: Search Qdrant for context
         query_vector = model.encode(user_query).tolist()
-        results = qdrant.search(collection_name="virtual-lenny", query_vector=query_vector, limit=3)
+
+        results = qdrant.query_points(
+            collection_name="virtual-lenny",
+            query=query_vector,
+            limit=3
+        ).point # https://github.com/qdrant/qdrant-client/issues/716 
+
         context_text = "\n\n".join([r.payload['content'] for r in results])
 
         # 3. Prompt Construction
@@ -44,7 +50,7 @@ def lambda_handler(event, context):
         Answer:"""
 
         # https://docs.aws.amazon.com/code-library/latest/ug/python_3_bedrock-runtime_code_examples.html 
-        # 4. Bedrock Streaming (Claude 3 Haiku)
+        # 4. Bedrock Streaming 
         response = bedrock.converse_stream(
                     modelId="amazon.nova-lite-v1:0",
                     messages=[{
