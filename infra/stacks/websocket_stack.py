@@ -90,10 +90,15 @@ class WebSocketStack(Stack):
             }
         )
         
-        # Grant Bedrock Permissions
+        # Grant Bedrock permissions
         message_handler.add_to_role_policy(iam.PolicyStatement(
-            actions=["bedrock:ConverseStream", "bedrock:InvokeModel"],
-            resources=["*"]
+            actions=[
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream",
+                "bedrock:ConverseStream",
+                "bedrock:Converse"
+            ],
+            resources=["*"]  # You can restrict this to specific model ARNs
         ))
         
         # -------------------------
@@ -147,4 +152,3 @@ class WebSocketStack(Stack):
             description="WebSocket API ID"
         )
 
-        
