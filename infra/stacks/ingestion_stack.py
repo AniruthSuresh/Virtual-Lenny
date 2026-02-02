@@ -339,3 +339,4 @@ class IngestionStack(Stack):
             value=f"https://console.aws.amazon.com/states/home?region={self.region}#/statemachines/view/{self.state_machine.state_machine_arn}",
             description="AWS Console URL for the state machine"
         )
+
