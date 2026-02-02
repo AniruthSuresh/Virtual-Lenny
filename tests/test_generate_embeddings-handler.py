@@ -18,7 +18,7 @@ def test_embedding_lambda():
     test_event = {
         "bucket": os.getenv("DATA_BUCKET_NAME"),
         "input_key": "data/chunks/final_chunks.json",
-        "output_key": "data/embedded/mxbai_corpus.pt"
+        "output_key": "data/embedded/mxbai_corpus.npz"
     }
 
     print("Starting Embedding Test (this may take a minute)...")
