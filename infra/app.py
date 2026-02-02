@@ -1,6 +1,7 @@
 import aws_cdk as cdk
 from stacks.storage_stack import StorageStack
 from stacks.ingestion_stack import IngestionStack
+from stacks.websocket_stack import WebSocketStack  
 
 app = cdk.App()
 
@@ -14,6 +15,13 @@ IngestionStack(
     "VirtualLennyIngestionStack",
     data_bucket=storage.bucket
 )
+
+# Stack 3: WebSocket (NEW)
+WebSocketStack(
+    app,
+    "VirtualLennyWebSocketStack"
+)
+
 
 app.synth()
 
