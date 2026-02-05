@@ -132,8 +132,6 @@ def lambda_handler(event, context):
         )
         
 
-
-
         # https://docs.aws.amazon.com/code-library/latest/ug/python_3_bedrock-runtime_code_examples.html 
         # 4. Bedrock Streaming 
         # response = bedrock.converse_stream(
@@ -172,7 +170,7 @@ def lambda_handler(event, context):
                     "content": token
                 })
         
-        print("✅ Response generated")
+        print("Response generated")
         
         # Calculate evaluation scores
         groundedness = evaluator.calculate_groundedness_score(
@@ -187,7 +185,7 @@ def lambda_handler(event, context):
             search_result
         )
         
-        print(f"📊 Groundedness: {groundedness}, Coherence: {coherence}, Attribution: {source_attribution}")
+        print(f"Groundedness: {groundedness}, Coherence: {coherence}, Attribution: {source_attribution}")
         
         # Calculate RAG score
         rag_score = evaluator.calculate_rag_score(
@@ -197,7 +195,7 @@ def lambda_handler(event, context):
             source_attribution
         )
         
-        print(f"🎯 RAG Score: {rag_score['overall']}% ({rag_score['grade']})")
+        print(f" RAG Score: {rag_score['overall']}% ({rag_score['grade']})")
         
         # Send evaluation scores
         send_message(apigw, connection_id, {
