@@ -174,18 +174,18 @@ export default function Terminal() {
       {/* Messages Area */}
       <div className="h-[500px] overflow-y-auto p-4 space-y-4 font-mono text-sm terminal-scrollbar">
         {messages.map((msg, idx) => (
-          <div key={idx} className="animate-in fade-in duration-200">
+          <div key={idx} className="animate-fade-in">
             {msg.type === 'user' && (
               <div className="flex gap-2">
-                <span className="text-green-400">❯</span>
-                <span className="text-white">{msg.content}</span>
+                <span className="text-green-400 flex-shrink-0">❯</span>
+                <span className="text-white break-words">{msg.content}</span>
               </div>
             )}
             
             {msg.type === 'assistant' && (
               <div className="flex gap-2">
-                <span className="text-blue-400">🤖</span>
-                <div className="text-gray-300 whitespace-pre-wrap flex-1">
+                <span className="text-blue-400 flex-shrink-0">🤖</span>
+                <div className="text-gray-300 whitespace-pre-wrap flex-1 break-words">
                   {msg.content}
                   {isStreaming && idx === messages.length - 1 && (
                     <span className="cursor-blink ml-1">▊</span>

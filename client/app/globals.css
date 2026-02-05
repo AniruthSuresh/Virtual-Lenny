@@ -1,12 +1,6 @@
-/* @tailwind base;
+@tailwind base;
 @tailwind components;
-@tailwind utilities; */
-
-/* https://stackoverflow.com/questions/77443221/cannot-apply-unknown-utility-class-border-border-the-border-border-class-d
-*/
-
-@import "tailwindcss";
-@config "../tailwind.config.ts"; 
+@tailwind utilities;
 
 @layer base {
   :root {
@@ -45,4 +39,20 @@
 
 .cursor-blink {
   animation: blink 1s infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }

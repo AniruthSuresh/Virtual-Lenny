@@ -12,7 +12,7 @@ export default function Home() {
           <p className="text-gray-400 text-lg">
             RAG-Powered Product Management Assistant
           </p>
-          <div className="mt-4 flex gap-2 justify-center text-sm text-gray-500">
+          <div className="mt-4 flex gap-2 justify-center text-sm text-gray-500 flex-wrap">
             <span className="px-3 py-1 bg-gray-800 rounded-full">
               AWS Lambda
             </span>
@@ -20,10 +20,13 @@ export default function Home() {
               Bedrock Nova
             </span>
             <span className="px-3 py-1 bg-gray-800 rounded-full">
-              Qdrant
+              Qdrant Cloud
             </span>
             <span className="px-3 py-1 bg-gray-800 rounded-full">
-              WebSocket
+              WebSocket API
+            </span>
+            <span className="px-3 py-1 bg-gray-800 rounded-full">
+              Step Functions
             </span>
           </div>
         </div>
@@ -34,7 +37,10 @@ export default function Home() {
         {/* Footer */}
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
-            Built with Next.js • Deployed on Vercel • Powered by AWS
+            Built with Next.js 15 • Deployed on Vercel • Powered by AWS
+          </p>
+          <p className="mt-2 text-xs text-gray-600">
+            MLOps Assignment - Virtual Lenny RAG System
           </p>
         </div>
       </div>
