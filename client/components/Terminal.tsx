@@ -6,6 +6,23 @@ interface Message {
   type: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: Date;
+  evaluation?: RAGScore;
+}
+
+interface RAGScore {
+  overall: number;
+  breakdown: {
+    retrieval: number;
+    groundedness: number;
+    coherence: number;
+    attribution: number;
+  };
+  grade: string;
+  details: {
+    avg_similarity: number;
+    top_similarity: number;
+    source_diversity: number;
+  };
 }
 
 export default function Terminal() {
@@ -22,6 +39,7 @@ export default function Terminal() {
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const currentAssistantMessageRef = useRef('');
+  const currentEvaluationRef = useRef<RAGScore | null>(null);
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -95,14 +113,31 @@ export default function Terminal() {
               
               return newMessages;
             });
+          } else if (data.type === 'evaluation') {
+            // Store evaluation data
+            currentEvaluationRef.current = data.score;
+            
+            // Update the last assistant message with evaluation
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              
+              if (lastMessage?.type === 'assistant') {
+                lastMessage.evaluation = data.score;
+              }
+              
+              return newMessages;
+            });
           } else if (data.type === 'done') {
             // Streaming complete
             setIsStreaming(false);
             currentAssistantMessageRef.current = '';
+            currentEvaluationRef.current = null;
           } else if (data.type === 'error') {
             addSystemMessage(`❌ Error: ${data.message}`);
             setIsStreaming(false);
             currentAssistantMessageRef.current = '';
+            currentEvaluationRef.current = null;
           }
         } catch (error) {
           console.error('Failed to parse message:', error);
@@ -137,6 +172,7 @@ export default function Terminal() {
       wsRef.current.send(JSON.stringify({ message: input }));
       setIsStreaming(true);
       currentAssistantMessageRef.current = '';
+      currentEvaluationRef.current = null;
     }
 
     setInput('');
@@ -147,6 +183,25 @@ export default function Terminal() {
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  const getGradeColor = (grade: string) => {
+    switch (grade) {
+      case 'A': return 'text-green-400';
+      case 'B': return 'text-blue-400';
+      case 'C': return 'text-yellow-400';
+      case 'D': return 'text-orange-400';
+      case 'F': return 'text-red-400';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 70) return 'bg-blue-500';
+    if (score >= 60) return 'bg-yellow-500';
+    if (score >= 50) return 'bg-orange-500';
+    return 'bg-red-500';
   };
 
   return (
@@ -183,14 +238,75 @@ export default function Terminal() {
             )}
             
             {msg.type === 'assistant' && (
-              <div className="flex gap-2">
-                <span className="text-blue-400 flex-shrink-0">🤖</span>
-                <div className="text-gray-300 whitespace-pre-wrap flex-1 break-words">
-                  {msg.content}
-                  {isStreaming && idx === messages.length - 1 && (
-                    <span className="cursor-blink ml-1">▊</span>
-                  )}
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <span className="text-blue-400 flex-shrink-0">🤖</span>
+                  <div className="text-gray-300 whitespace-pre-wrap flex-1 break-words">
+                    {msg.content}
+                    {isStreaming && idx === messages.length - 1 && (
+                      <span className="cursor-blink ml-1">▊</span>
+                    )}
+                  </div>
                 </div>
+                
+                {/* RAG Quality Evaluation */}
+                {msg.evaluation && (
+                  <div className="ml-6 mt-3 p-3 bg-gray-800 border border-gray-700 rounded">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-400 uppercase tracking-wide">
+                        Response Quality
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-2xl font-bold ${getGradeColor(msg.evaluation.grade)}`}>
+                          {msg.evaluation.grade}
+                        </span>
+                        <span className="text-gray-400 text-sm">
+                          {msg.evaluation.overall}%
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Score Breakdown */}
+                    <div className="space-y-2 mt-3">
+                      {Object.entries(msg.evaluation.breakdown).map(([key, value]) => (
+                        <div key={key} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-400 capitalize">{key}</span>
+                            <span className="text-gray-300">{value}%</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-1.5">
+                            <div
+                              className={`h-1.5 rounded-full transition-all duration-500 ${getScoreColor(value)}`}
+                              style={{ width: `${value}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Details */}
+                    <div className="mt-3 pt-3 border-t border-gray-700 grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <div className="text-gray-500">Avg Similarity</div>
+                        <div className="text-gray-300 font-medium">
+                          {(msg.evaluation.details.avg_similarity * 100).toFixed(1)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Top Match</div>
+                        <div className="text-gray-300 font-medium">
+                          {(msg.evaluation.details.top_similarity * 100).toFixed(1)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Diversity</div>
+                        <div className="text-gray-300 font-medium">
+                          {(msg.evaluation.details.source_diversity * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             
@@ -229,7 +345,7 @@ export default function Terminal() {
           </button>
         </div>
         <div className="mt-2 text-xs text-gray-500 text-center">
-          Press Enter to send • Shift+Enter for new line
+          Press Enter to send 
         </div>
       </div>
     </div>
