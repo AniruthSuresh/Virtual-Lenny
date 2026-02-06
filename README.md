@@ -31,6 +31,11 @@ This script generates a set of synthetic questions derived from both **LinkedIn 
 
 ## High-Level Architecture
 
+Complete architecture : 
+
+![Ablation on time](./results/Complete-Pipeline.png)
+
+
 > [!IMPORTANT]  
 > A detailed, component-by-component breakdown is available in `implementation.md`.  
 > This section gives a high-level view of how the system fits together.
@@ -181,3 +186,4 @@ virtual-lenny/
 > LLMs (mostly Claude Sonnet 4.5) were used extensively while building the `/client` frontend, since frontend development is not my strongest area yet. This may have led to slightly lower code quality or rough edges in that part of the project. The rest of the system (infra, backend, and RAG pipeline) was implemented more directly & hence better developed . 
 
 
+---
