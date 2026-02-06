@@ -66,7 +66,7 @@ The **backend** exposes a **WebSocket API Gateway** (`/infra/stacks/websocket_st
 ### 1️⃣ Conda Environment (for local testing)
 
 ```bash
-conda create -n virtual-lenny python=3.11 -y
+conda env create -f environment.yml
 conda activate virtual-lenny
 ```
 
