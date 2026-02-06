@@ -172,4 +172,6 @@ virtual-lenny/
 
 ---
 
+> **Note**  
+> LLMs (mostly Claude Sonnet 4.5) were used extensively while building the `/client` frontend, since frontend development is not my strongest area yet. This may have led to slightly lower code quality or rough edges in that part of the project. The rest of the system (infra, backend, and RAG pipeline) was implemented more directly & hence better developed . 
 
