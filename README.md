@@ -126,7 +126,7 @@ vercel --prod
 AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'list_transcripts'
 ```
 It turns out the API behavior changed across versions, so a lot of older examples no longer work.
-I followed this discussion / PR and it worked flawlessly for me:https://github.com/langchain-ai/langchain-community/issues/290#issuecomment-3301428239
+I followed this discussion / PR and it worked flawlessly for me : https://github.com/langchain-ai/langchain-community/issues/290#issuecomment-3301428239
 
 
 ### 2️⃣ NumPy / Torch / Cython Conflicts (Docker)
@@ -148,11 +148,11 @@ This popped up when using Next.js 15 + Tailwind v4.
 
 Fix that worked for me: Upgraded Node.js to v22.13.0
 
-There are also alternative approaches discussed here:https://github.com/tailwindlabs/tailwindcss/discussions/16067
+There are also alternative approaches discussed here: https://github.com/tailwindlabs/tailwindcss/discussions/16067
 
 ### 4️⃣ Qdrant Request Timeouts
 
-I occasionally ran into random request timeouts during indexing and search. Fix:https://github.com/qdrant/qdrant-client/issues/394#issuecomment-2075283788
+I occasionally ran into random request timeouts during indexing and search. Fix: https://github.com/qdrant/qdrant-client/issues/394#issuecomment-2075283788
 
 ---
 
