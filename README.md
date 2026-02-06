@@ -1,5 +1,5 @@
 # Virtual Lenny
->  Retrieval-Augmented Generation (RAG) system that recreates **Lenny Rachitsky’s product thinking style** using AWS serverless infrastructure, vector search, and real-time WebSocket streaming.
+Retrieval-Augmented Generation (RAG) system that recreates **Lenny Rachitsky’s product thinking style** using AWS serverless infrastructure, vector search, and real-time WebSocket streaming.
 
 This project builds a **full end-to-end RAG pipeline**  from scraping real PM content to serving low-latency, streaming answers in a  web UI.
 
@@ -21,7 +21,8 @@ This script generates a set of synthetic questions derived from both **LinkedIn 
 
 
 
-> NOTE : The first response might take around **7 -12** seconds because I’m using a **mxbai-embed-large-v1** for better retrieval quality (see ablation run time and accuracy across models below). Loading it adds some latency, but the quality boost was worth it for now. Optimizing this tradeoff is an active direction I plan to explore.
+> [!IMPORTANT]  
+> The first response might take around **7 -12** seconds because I’m using a **mxbai-embed-large-v1** for better retrieval quality (see ablation run time and accuracy across models below). Loading it adds some latency, but the quality boost was worth it for now. Optimizing this tradeoff is an active direction I plan to explore.
 
 ![Ablation on time](./results/mixed_embeddings_combined_vertical.png)
 
@@ -96,7 +97,8 @@ cd infra
 cdk bootstrap
 cdk deploy --all 
 ```
-> [WARN] :  The deployment may take a while due to large Docker image builds.
+> [!NOTE]  
+>   The deployment may take a while due to large Docker image builds.
 
 ### 4️⃣ Web Client Deployment (Vercel)
 
@@ -106,11 +108,13 @@ npm install
 echo "NEXT_PUBLIC_WEBSOCKET_URL=<YOUR_WS_URL>" > .env.local
 vercel --prod
 ```
-Easiest way on Vercel:
-1. Import the GitHub repository
-2. Select Next.js and point it to the client/ directory
-3. Set NEXT_PUBLIC_WEBSOCKET_URL in environment variables
-4. Click Deploy
+
+> [!TIP]
+> Easiest way on Vercel:
+> 1. Import the GitHub repository
+> 2. Select Next.js and point it to the client/ directory
+> 3. Set NEXT_PUBLIC_WEBSOCKET_URL in environment variables
+> 4. Click Deploy
 
 ---
 
@@ -172,6 +176,7 @@ virtual-lenny/
 
 ---
 
-> **Note**  
+> [!NOTE]  
 > LLMs (mostly Claude Sonnet 4.5) were used extensively while building the `/client` frontend, since frontend development is not my strongest area yet. This may have led to slightly lower code quality or rough edges in that part of the project. The rest of the system (infra, backend, and RAG pipeline) was implemented more directly & hence better developed . 
+
 
