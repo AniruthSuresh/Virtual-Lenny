@@ -15,8 +15,7 @@ This project builds a **full end-to-end RAG pipeline**  from scraping real PM co
 **Live demo**:  
 🌐 https://virutal-lenny-with-eval.vercel.app/
 
-For testing and evaluation, I also included a small script at  
-`src/generate-synthetic-questions/`.
+For testing and evaluation, I also included a small script at `src/generate-synthetic-questions.py`.
 
 This script generates a set of synthetic questions derived from both **LinkedIn posts** and **YouTube transcripts**, and can be used to test the RAG pipeline . 
 
@@ -58,5 +57,15 @@ The **frontend** is built using **Next.js 15** and **React 19**, with a simple t
 
 
 The **backend** exposes a **WebSocket API Gateway** (`/infra/stacks/websocket_stack.py`) backed by **AWS Lambda**, responsible for managing connections, routing messages to the RAG agent, and streaming partial responses back to the client. This setup enables real-time interaction and cleanly separates connection lifecycle management (connect / disconnect) from message handling and model inference, which lives under `/agent/*`.
+
+
+## Setup 
+
+### 1️⃣ Conda Environment (for local testing)
+
+```bash
+conda create -n virtual-lenny python=3.11 -y
+conda activate virtual-lenny
+```
 
 
