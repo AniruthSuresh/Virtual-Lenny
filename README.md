@@ -52,7 +52,7 @@ The deployment success for both the stacks on aws step function :
 
 ### 2. RAG Agent
 
-The RAG agent embeds user queries using `mixedbread-ai/mxbai-embed-large-v1` (1024 dimensions) and performs semantic retrieval against **Qdrant Cloud** to fetch the most relevant context. Responses are generated via **AWS Bedrock (Nova Lite)** with token-level streaming and delivered to the client in real time over a **WebSocket API**.
+The RAG agent embeds user queries using `mixedbread-ai/mxbai-embed-large-v1` (1024 dimensions) and performs semantic retrieval against **Qdrant Cloud** to fetch the most relevant context. Responses are generated via **AWS Bedrock (Nova Lite)** with token-level streaming and delivered to the client in real time over a *o*WebSocket API**.
 
 Each response is automatically evaluated using an internal **RAG quality scorer**, which measures retrieval relevance, groundedness , coherence and retrieved context(youtube / linkedin in this case). 
 
@@ -60,7 +60,7 @@ Each response is automatically evaluated using an internal **RAG quality scorer*
 
 ### 3. Web Interface
 
-The **frontend** is built using **Next.js 15** and **React 19**, with a simple terminal-style UI using **Tailwind CSS**.  The client talks to the backend over a persistent WebSocket connection, streams tokens in real time, and shows the RAG quality score alongside each response. The frontend is deployed on **Vercel**.
+The **frontend** is built using **Next.js 15** and **React 19**, with a simple ter`minal-style UI using **Tailwind CSS**.  The client talks to the backend over a persistent WebSocket connection, streams tokens in real time, and shows the RAG quality score alongside each response. The frontend is deployed on **Vercel**.
 
 
 The **backend** exposes a **WebSocket API Gateway** (`/infra/stacks/websocket_stack.py`) backed by **AWS Lambda**, responsible for managing connections, routing messages to the RAG agent, and streaming partial responses back to the client. This setup enables real-time interaction and cleanly separates connection lifecycle management (connect / disconnect) from message handling and model inference, which lives under `/agent/*`.

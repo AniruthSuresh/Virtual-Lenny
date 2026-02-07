@@ -238,14 +238,11 @@ Handles real-time user queries and streams AI responses back to the client.
 
 This stack is responsible for *interaction*, not ingestion.
 
-### Core Components
 
 #### WebSocket API Gateway
 - Maintains persistent client connections
 - Enables token-level streaming responses
-- Feels instant and conversational
 
----
 
 #### DynamoDB Table
 - Tracks active WebSocket connections
@@ -254,7 +251,6 @@ This stack is responsible for *interaction*, not ingestion.
 **Why DynamoDB:**  
 Cheap, serverless, and perfect for ephemeral connection metadata.
 
----
 
 ### Lambda Functions in This Stack
 
@@ -263,9 +259,8 @@ Cheap, serverless, and perfect for ephemeral connection metadata.
 - Stores the connection ID in DynamoDB
 
 **Role:**  
-Pure lifecycle management — no business logic.
+Pure lifecycle management - no business logic.
 
----
 
 #### 2. `disconnect_handler`
 - Triggered when a client disconnects
@@ -274,7 +269,6 @@ Pure lifecycle management — no business logic.
 **Role:**  
 Keeps the connection table clean and cheap.
 
----
 
 #### 3. `message_handler` (The RAG Agent)
 This is the heart of the system.
@@ -294,7 +288,6 @@ Needed for embedding model + evaluation logic.
 **Why WebSockets:**  
 Streaming dramatically improves perceived latency and UX.
 
----
 
 ## 4️⃣ Frontend (Vercel)
 
@@ -310,7 +303,6 @@ A simple, real-time interface for talking to the RAG agent.
 
 The frontend is intentionally minimal and functional rather than polished, since the focus of the project is backend systems and RAG quality.
 
----
 
 ## How Everything Fits Together
 
@@ -321,16 +313,7 @@ The frontend is intentionally minimal and functional rather than polished, since
 
 Each layer can evolve independently without breaking the others.
 
----
-
-## Why This Structure Works
-
-- Clear separation of concerns
-- Easy to debug and iterate
-- Cheap to run
-- Scales naturally
-- Looks and behaves like a production system without being over-engineered
-
 This architecture is intentionally designed to be **simple now** and **expandable later**, which is exactly what you want for a serious RAG system.
 
 ---
+
