@@ -13,7 +13,8 @@ This project builds a **full end-to-end RAG pipeline**  from scraping real PM co
 ![Virtual Lenny Demo](./results/virtual-lenny-demo.gif)
 
 **Live demo**:  
-🌐 https://virutal-lenny-with-eval.vercel.app/
+🌐 https://virtual-lenny.vercel.app/
+
 
 For testing and evaluation, I also included a small script at `src/generate-synthetic-questions.py`. (underhood , the questions are generated locally using Ollama)
 
